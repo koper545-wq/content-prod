@@ -4,6 +4,7 @@ import { createSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { z } from "zod";
+import { rateLimit } from "@/lib/rate-limit";
 
 const schema = z.object({
   email: z.string().email(),
@@ -11,6 +12,12 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  // Rate limit: 10 login attempts per IP per minute
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!rateLimit(`login:${ip}`, 10, 60_000)) {
+    return NextResponse.json({ error: "Zbyt wiele prób. Spróbuj za minutę." }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const parsed = schema.safeParse(body);
@@ -58,7 +65,7 @@ export async function POST(request: Request) {
 
     const cookieStore = await cookies();
     cookieStore.set("onboarding_complete", onboardingComplete ? "true" : "false", {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,

@@ -55,7 +55,7 @@ export async function POST(request: Request) {
 
     const cookieStore = await cookies();
     cookieStore.set("onboarding_complete", "true", {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,

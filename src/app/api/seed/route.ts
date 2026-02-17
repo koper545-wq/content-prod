@@ -8,6 +8,11 @@ const DEMO_PASSWORD = "demo1234";
 export const dynamic = "force-dynamic";
 
 export async function POST() {
+  // Gate: seed only available when demo is enabled
+  if (process.env.DEMO_ENABLED !== "true") {
+    return NextResponse.json({ error: "Seed wyłączony" }, { status: 404 });
+  }
+
   try {
     // Check if demo data already exists
     const existing = await prisma.user.findUnique({

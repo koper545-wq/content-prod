@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
+import { rateLimit } from "@/lib/rate-limit";
 
-const SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "dev-secret-change-in-production-min-32-chars-long"
-);
+const SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
 
 const DEMO_ACCOUNTS: Record<string, { id: string; email: string; role: string; nameDisplay: string; status: string }> = {
   creator: {
@@ -31,6 +30,17 @@ const DEMO_ACCOUNTS: Record<string, { id: string; email: string; role: string; n
 };
 
 export async function POST(request: Request) {
+  // Gate: demo must be explicitly enabled
+  if (process.env.DEMO_ENABLED !== "true") {
+    return NextResponse.json({ error: "Demo wyłączone" }, { status: 404 });
+  }
+
+  // Rate limit: 20 requests per IP per minute
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!rateLimit(`demo-login:${ip}`, 20, 60_000)) {
+    return NextResponse.json({ error: "Zbyt wiele prób. Spróbuj za minutę." }, { status: 429 });
+  }
+
   try {
     const { account } = await request.json();
 
@@ -61,7 +71,7 @@ export async function POST(request: Request) {
 
     // Demo users skip onboarding
     cookieStore.set("onboarding_complete", "true", {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,

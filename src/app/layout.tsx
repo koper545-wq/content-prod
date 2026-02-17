@@ -7,7 +7,13 @@ const inter = Inter({ subsets: ["latin", "latin-ext"] });
 
 export const metadata: Metadata = {
   title: "CONTENT – platforma barterowa",
-  description: "Połącz restaurację z twórcami treści",
+  description: "Połącz restaurację z twórcami treści. Barter jedzenie za content.",
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "https://content-prod.vercel.app"),
+  openGraph: {
+    title: "CONTENT – platforma barterowa",
+    description: "Połącz restaurację z twórcami treści",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

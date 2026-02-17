@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "dev-secret-change-in-production-min-32-chars-long"
-);
+const SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
 
 const PUBLIC_PATHS = ["/login", "/register", "/api/auth", "/api/seed", "/api/demo-login", "/oczekiwanie"];
 

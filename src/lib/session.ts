@@ -3,9 +3,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "./prisma";
 import type { UserRole } from "@/generated/prisma";
 
-const SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || "dev-secret-change-in-production-min-32-chars-long"
-);
+const SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
 
 export interface SessionUser {
   id: string;

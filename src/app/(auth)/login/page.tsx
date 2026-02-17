@@ -144,8 +144,10 @@ function LoginContent() {
     }
   }
 
-  // Demo mode — clean, presentation-ready
-  if (isDemo) {
+  const demoEnabled = process.env.NEXT_PUBLIC_DEMO_ENABLED === "true";
+
+  // Demo mode — clean, presentation-ready (only if enabled via env var)
+  if (isDemo && demoEnabled) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-amber-50 px-4">
         <div className="w-full max-w-md">
@@ -250,11 +252,13 @@ function LoginContent() {
           </Link>
         </p>
 
-        <p className="text-center text-xs text-gray-400 mt-2">
-          <Link href="/login?demo=true" className="hover:text-orange-500 transition-colors">
-            Wypróbuj demo →
-          </Link>
-        </p>
+        {demoEnabled && (
+          <p className="text-center text-xs text-gray-400 mt-2">
+            <Link href="/login?demo=true" className="hover:text-orange-500 transition-colors">
+              Wypróbuj demo →
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );
