@@ -1,0 +1,356 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserRole {
+  CREATOR
+  RESTAURANT_OWNER
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum FollowerRange {
+  UNDER_2K
+  FROM_2K_TO_10K
+  FROM_10K_TO_30K
+  FROM_30K_TO_100K
+  OVER_100K
+}
+
+enum RestaurantStatus {
+  ACTIVE
+  PAUSED
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum SlotStatus {
+  OPEN
+  FULL
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum BookingStatus {
+  BOOKED
+  CONFIRMATION_PENDING
+  CONFIRMED
+  CANCELLED_BY_CREATOR
+  CANCELLED_BY_RESTAURANT
+  NO_SHOW
+  VISITED
+  CONTENT_PENDING
+  CONTENT_SUBMITTED
+  COMPLETED
+  DISPUTED
+}
+
+enum CancellationPolicy {
+  FLEX
+  STRICT
+}
+
+enum ContentType {
+  IG_REEL
+  IG_STORY
+  TIKTOK
+  OTHER
+}
+
+enum ContentSubmissionStatus {
+  SUBMITTED
+  APPROVED
+  CHANGES_REQUESTED
+}
+
+enum AssetFileType {
+  IMAGE
+  VIDEO
+}
+
+enum UsageLicense {
+  ORGANIC_REPOST_ONLY
+}
+
+enum ReportType {
+  NO_SHOW
+  BAD_BEHAVIOR
+  NO_CONTENT
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  REJECTED
+}
+
+enum NotificationType {
+  APPLICATION_ACCEPTED
+  APPLICATION_REJECTED
+  CONFIRM_VISIT
+  CONTENT_DUE_REMINDER
+  CONTENT_SUBMITTED
+  NEW_APPLICATION
+  CREATOR_CONFIRMED
+  OVERDUE_CONTENT
+  STRIKE_WARNING
+  BOOKING_CANCELLED
+  SLOT_CANCELLED
+}
+
+// ============================================================
+// MODELS
+// ============================================================
+
+model User {
+  id             String     @id @default(uuid())
+  role           UserRole
+  email          String     @unique
+  phone          String?
+  nameDisplay    String     @map("name_display")
+  passwordHash   String?    @map("password_hash")
+  status         UserStatus @default(ACTIVE)
+  suspendedUntil DateTime?  @map("suspended_until")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+  lastLoginAt    DateTime?  @map("last_login_at")
+
+  creatorProfile    CreatorProfile?
+  restaurants       Restaurant[]
+  applications      Application[]
+  bookingsAsCreator Booking[]      @relation("CreatorBookings")
+  assets            Asset[]
+  reportsCreated    Report[]       @relation("ReporterReports")
+  notifications     Notification[]
+  magicLinks        MagicLink[]
+
+  @@map("users")
+}
+
+model MagicLink {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("magic_links")
+}
+
+model CreatorProfile {
+  userId        String        @id @map("user_id")
+  city          String
+  geoLat        Float?        @map("geo_lat")
+  geoLng        Float?        @map("geo_lng")
+  instagramUrl  String        @map("instagram_url")
+  tiktokUrl     String?       @map("tiktok_url")
+  portfolioUrl  String?       @map("portfolio_url")
+  followerRange FollowerRange @map("follower_range")
+  niches        String[]
+  languages     String[]
+  notesPrivate  String?       @map("notes_private")
+  strikesCount  Int           @default(0) @map("strikes_count")
+  strikesLastAt DateTime?     @map("strikes_last_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("creator_profiles")
+}
+
+model Restaurant {
+  id               String           @id @default(uuid())
+  ownerUserId      String           @map("owner_user_id")
+  name             String
+  addressLine      String           @map("address_line")
+  city             String
+  geoLat           Float?           @map("geo_lat")
+  geoLng           Float?           @map("geo_lng")
+  instagramUrl     String?          @map("instagram_url")
+  websiteUrl       String?          @map("website_url")
+  phone            String?
+  openingHoursJson Json?            @map("opening_hours_json")
+  status           RestaurantStatus @default(ACTIVE)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  owner     User       @relation(fields: [ownerUserId], references: [id])
+  campaigns Campaign[]
+  bookings  Booking[]
+
+  @@map("restaurants")
+}
+
+model Campaign {
+  id                        String             @id @default(uuid())
+  restaurantId              String             @map("restaurant_id")
+  title                     String
+  descriptionShort          String             @map("description_short")
+  descriptionDetails        String?            @map("description_details")
+  offerValueDesc            String             @map("offer_value_desc")
+  deliverablesJson          Json               @map("deliverables_json")
+  requirementsJson          Json?              @map("requirements_json")
+  contentDeadlineDays       Int                @default(7) @map("content_deadline_days")
+  confirmationRequiredHours Int                @default(24) @map("confirmation_required_hours")
+  cancellationPolicy        CancellationPolicy @default(FLEX) @map("cancellation_policy")
+  status                    CampaignStatus     @default(DRAFT)
+  createdAt                 DateTime           @default(now()) @map("created_at")
+  updatedAt                 DateTime           @updatedAt @map("updated_at")
+
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
+  slots        Slot[]
+  applications Application[]
+  bookings     Booking[]
+
+  @@map("campaigns")
+}
+
+model Slot {
+  id          String     @id @default(uuid())
+  campaignId  String     @map("campaign_id")
+  startAt     DateTime   @map("start_at")
+  endAt       DateTime   @map("end_at")
+  capacity    Int        @default(1)
+  bookedCount Int        @default(0) @map("booked_count")
+  status      SlotStatus @default(OPEN)
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  campaign Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@map("slots")
+}
+
+model Application {
+  id               String            @id @default(uuid())
+  campaignId       String            @map("campaign_id")
+  creatorUserId    String            @map("creator_user_id")
+  message          String?
+  preferredSlotIds String[]          @map("preferred_slot_ids")
+  status           ApplicationStatus @default(APPLIED)
+  rejectionReason  String?           @map("rejection_reason")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  campaign Campaign @relation(fields: [campaignId], references: [id])
+  creator  User     @relation(fields: [creatorUserId], references: [id])
+
+  @@unique([campaignId, creatorUserId])
+  @@map("applications")
+}
+
+model Booking {
+  id            String        @id @default(uuid())
+  campaignId    String        @map("campaign_id")
+  restaurantId  String        @map("restaurant_id")
+  creatorUserId String        @map("creator_user_id")
+  slotId        String        @map("slot_id")
+  status        BookingStatus @default(BOOKED)
+  confirmBy     DateTime?     @map("confirm_by")
+  contentDueAt  DateTime?     @map("content_due_at")
+  checkinNote   String?       @map("checkin_note")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  campaign          Campaign           @relation(fields: [campaignId], references: [id])
+  restaurant        Restaurant         @relation(fields: [restaurantId], references: [id])
+  creator           User               @relation("CreatorBookings", fields: [creatorUserId], references: [id])
+  slot              Slot               @relation(fields: [slotId], references: [id])
+  contentSubmission ContentSubmission?
+  assets            Asset[]
+  reports           Report[]
+
+  @@map("bookings")
+}
+
+model ContentSubmission {
+  id                   String                  @id @default(uuid())
+  bookingId            String                  @unique @map("booking_id")
+  linksJson            Json                    @map("links_json")
+  submittedAt          DateTime                @default(now()) @map("submitted_at")
+  restaurantApprovedAt DateTime?               @map("restaurant_approved_at")
+  status               ContentSubmissionStatus @default(SUBMITTED)
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("content_submissions")
+}
+
+model Asset {
+  id                  String       @id @default(uuid())
+  uploaderUserId      String       @map("uploader_user_id")
+  fileUrl             String       @map("file_url")
+  fileType            AssetFileType @map("file_type")
+  sizeBytes           Int          @map("size_bytes")
+  createdAt           DateTime     @default(now()) @map("created_at")
+  usageLicense        UsageLicense @default(ORGANIC_REPOST_ONLY) @map("usage_license")
+  associatedBookingId String?      @map("associated_booking_id")
+
+  uploader User     @relation(fields: [uploaderUserId], references: [id])
+  booking  Booking? @relation(fields: [associatedBookingId], references: [id])
+
+  @@map("assets")
+}
+
+model Report {
+  id           String       @id @default(uuid())
+  bookingId    String       @map("booking_id")
+  reporterRole UserRole     @map("reporter_role")
+  type         ReportType
+  description  String
+  status       ReportStatus @default(OPEN)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  resolvedAt   DateTime?    @map("resolved_at")
+  resolvedBy   String?      @map("resolved_by")
+
+  booking  Booking @relation(fields: [bookingId], references: [id])
+  resolver User?   @relation("ReporterReports", fields: [resolvedBy], references: [id])
+
+  @@map("reports")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  read      Boolean          @default(false)
+  emailSent Boolean          @default(false) @map("email_sent")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@map("notifications")
+}
