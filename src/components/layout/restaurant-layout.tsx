@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   Bell,
+  FileText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
@@ -20,6 +21,7 @@ const SIDEBAR_ITEMS = [
   { href: "/restaurant/campaigns", label: "Kampanie", icon: Megaphone },
   { href: "/restaurant/applications", label: "Aplikacje", icon: Users },
   { href: "/restaurant/bookings", label: "Rezerwacje", icon: CalendarCheck },
+  { href: "/restaurant/umowy", label: "Umowy", icon: FileText },
   { href: "/restaurant/library", label: "Biblioteka", icon: FolderOpen },
   { href: "/restaurant/settings", label: "Ustawienia", icon: Settings },
 ];

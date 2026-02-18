@@ -41,6 +41,7 @@ export async function GET(request: Request) {
         select: { id: true, startAt: true, endAt: true },
       },
       contentSubmission: true,
+      agreement: { select: { id: true, status: true } },
     },
     orderBy: { createdAt: "desc" },
   });

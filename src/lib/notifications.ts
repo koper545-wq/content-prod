@@ -171,3 +171,23 @@ export async function notifyCreatorConfirmed(restaurantOwnerId: string, creatorN
     link: `/restaurant/bookings/${bookingId}`,
   });
 }
+
+export async function notifyAgreementReady(creatorId: string, campaignTitle: string, agreementId: string) {
+  return createNotification({
+    userId: creatorId,
+    type: "AGREEMENT_READY",
+    title: "Umowa do podpisania",
+    body: `Umowa barterowa dla "${campaignTitle}" jest gotowa do podpisu.`,
+    link: `/creator/umowa/${agreementId}`,
+  });
+}
+
+export async function notifyAgreementSigned(restaurantOwnerId: string, creatorName: string, campaignTitle: string, agreementId: string) {
+  return createNotification({
+    userId: restaurantOwnerId,
+    type: "AGREEMENT_SIGNED",
+    title: "Umowa podpisana!",
+    body: `${creatorName} podpisał umowę dla "${campaignTitle}".`,
+    link: `/restaurant/umowa/${agreementId}`,
+  });
+}

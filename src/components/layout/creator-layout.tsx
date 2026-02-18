@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Compass, FolderOpen, User, Bell, LogOut, CalendarDays } from "lucide-react";
+import { Compass, FolderOpen, User, Bell, LogOut, CalendarDays, FileText } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 const NAV_ITEMS = [
   { href: "/creator/feed", label: "Feed", icon: Compass },
   { href: "/creator/kalendarz", label: "Kalendarz", icon: CalendarDays },
+  { href: "/creator/umowy", label: "Umowy", icon: FileText },
   { href: "/creator/moje", label: "Moje", icon: FolderOpen },
   { href: "/creator/profil", label: "Profil", icon: User },
 ];

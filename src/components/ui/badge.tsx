@@ -36,6 +36,9 @@ const VARIANT_STYLES: Record<string, string> = {
   no_content: "bg-orange-100 text-orange-700",
   bad_behavior: "bg-red-100 text-red-700",
   other: "bg-gray-100 text-gray-600",
+  pending_restaurant: "bg-yellow-100 text-yellow-700",
+  pending_creator: "bg-orange-100 text-orange-700",
+  signed: "bg-green-100 text-green-700",
 };
 
 export interface BadgeProps {

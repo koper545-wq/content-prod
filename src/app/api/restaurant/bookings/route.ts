@@ -40,6 +40,7 @@ export async function GET(request: Request) {
       campaign: { select: { id: true, title: true, deliverablesJson: true } },
       slot: { select: { id: true, startAt: true, endAt: true } },
       contentSubmission: true,
+      agreement: { select: { id: true, status: true } },
     },
     orderBy: { createdAt: "desc" },
   });

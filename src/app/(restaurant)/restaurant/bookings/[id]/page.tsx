@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { MapPin, Calendar, Clock, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { MapPin, Calendar, Clock, ExternalLink, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DeliverableDisplay } from "@/components/shared/deliverables-display";
-import { formatDate, formatTime, BOOKING_STATUS_LABELS } from "@/lib/utils";
+import { formatDate, formatTime, BOOKING_STATUS_LABELS, AGREEMENT_STATUS_LABELS } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 interface ContentLink {
@@ -24,6 +25,7 @@ interface Booking {
   campaign: { id: string; title: string; deliverablesJson: { reel?: number; stories?: number; photos?: number } };
   slot: { id: string; startAt: string; endAt: string };
   contentSubmission: { id: string; status: string; linksJson: ContentLink[] } | null;
+  agreement: { id: string; status: string } | null;
 }
 
 export default function BookingDetailPage() {
@@ -146,6 +148,26 @@ export default function BookingDetailPage() {
               </a>
             ))}
           </div>
+        </Card>
+      )}
+
+      {booking.agreement && (
+        <Card className="p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileText size={16} className="text-orange-500" />
+              <h3 className="font-semibold text-gray-900 text-sm">Umowa barterowa</h3>
+            </div>
+            <Badge variant={booking.agreement.status.toLowerCase()}>
+              {AGREEMENT_STATUS_LABELS[booking.agreement.status] || booking.agreement.status}
+            </Badge>
+          </div>
+          <Link href={`/restaurant/umowa/${booking.agreement.id}`} className="mt-2 inline-flex items-center gap-1 text-sm text-orange-500 hover:text-orange-600 font-medium">
+            Zobacz umowę →
+          </Link>
+          {booking.agreement.status === "PENDING_RESTAURANT" && (
+            <p className="text-xs text-orange-600 mt-1">⚡ Umowa czeka na Twój podpis</p>
+          )}
         </Card>
       )}
 

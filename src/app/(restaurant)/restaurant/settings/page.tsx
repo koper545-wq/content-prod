@@ -15,6 +15,9 @@ interface Restaurant {
   instagramUrl: string | null;
   websiteUrl: string | null;
   phone: string | null;
+  companyName: string | null;
+  nip: string | null;
+  companyAddress: string | null;
 }
 
 export default function SettingsPage() {
@@ -30,6 +33,9 @@ export default function SettingsPage() {
   const [instagramUrl, setInstagramUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [phone, setPhone] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [nip, setNip] = useState("");
+  const [companyAddress, setCompanyAddress] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -53,6 +59,9 @@ export default function SettingsPage() {
     setInstagramUrl(r.instagramUrl || "");
     setWebsiteUrl(r.websiteUrl || "");
     setPhone(r.phone || "");
+    setCompanyName(r.companyName || "");
+    setNip(r.nip || "");
+    setCompanyAddress(r.companyAddress || "");
   }
 
   function startAdd() {
@@ -64,6 +73,9 @@ export default function SettingsPage() {
     setInstagramUrl("");
     setWebsiteUrl("");
     setPhone("");
+    setCompanyName("");
+    setNip("");
+    setCompanyAddress("");
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -75,7 +87,7 @@ export default function SettingsPage() {
         const res = await fetch("/api/restaurant/me", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: editingId, name, addressLine, city, instagramUrl: instagramUrl || null, websiteUrl: websiteUrl || null, phone: phone || null }),
+          body: JSON.stringify({ id: editingId, name, addressLine, city, instagramUrl: instagramUrl || null, websiteUrl: websiteUrl || null, phone: phone || null, companyName: companyName || null, nip: nip || null, companyAddress: companyAddress || null }),
         });
         if (!res.ok) { const d = await res.json(); toast.error(d.error); return; }
         toast.success("Zapisano!");
@@ -84,7 +96,7 @@ export default function SettingsPage() {
         const res = await fetch("/api/restaurant/me", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, addressLine, city, instagramUrl: instagramUrl || undefined, websiteUrl: websiteUrl || undefined, phone: phone || undefined }),
+          body: JSON.stringify({ name, addressLine, city, instagramUrl: instagramUrl || undefined, websiteUrl: websiteUrl || undefined, phone: phone || undefined, companyName: companyName || undefined, nip: nip || undefined, companyAddress: companyAddress || undefined }),
         });
         if (!res.ok) { const d = await res.json(); toast.error(d.error); return; }
         toast.success("Restauracja dodana!");
@@ -116,6 +128,9 @@ export default function SettingsPage() {
               <Input label="Instagram URL" value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} />
               <Input label="Strona www" value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} />
               <Input label="Telefon" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <Input label="Nazwa firmy" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Sp. z o.o. / SA" />
+              <Input label="NIP" value={nip} onChange={(e) => setNip(e.target.value)} placeholder="1234567890" maxLength={10} />
+              <Input label="Adres firmy" value={companyAddress} onChange={(e) => setCompanyAddress(e.target.value)} placeholder="ul. Przykładowa 1, 00-001 Warszawa" />
               <div className="flex gap-2">
                 <Button type="submit" loading={saving}>Zapisz</Button>
                 <Button variant="ghost" type="button" onClick={() => setEditingId(null)}>Anuluj</Button>
@@ -132,6 +147,9 @@ export default function SettingsPage() {
                 {r.phone && <p>Tel: {r.phone}</p>}
                 {r.instagramUrl && <p>IG: {r.instagramUrl}</p>}
                 {r.websiteUrl && <p>Web: {r.websiteUrl}</p>}
+                {r.companyName && <p>Firma: {r.companyName}</p>}
+                {r.nip && <p>NIP: {r.nip}</p>}
+                {r.companyAddress && <p>Adres firmy: {r.companyAddress}</p>}
               </div>
             </div>
           )}
@@ -148,6 +166,9 @@ export default function SettingsPage() {
             <Input label="Instagram URL" value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="https://instagram.com/..." />
             <Input label="Strona www" value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} placeholder="https://..." />
             <Input label="Telefon" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+48..." />
+            <Input label="Nazwa firmy" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Sp. z o.o. / SA" />
+            <Input label="NIP" value={nip} onChange={(e) => setNip(e.target.value)} placeholder="1234567890" maxLength={10} />
+            <Input label="Adres firmy" value={companyAddress} onChange={(e) => setCompanyAddress(e.target.value)} placeholder="ul. Przykładowa 1, 00-001 Warszawa" />
             <div className="flex gap-2">
               <Button type="submit" loading={saving}>Dodaj</Button>
               <Button variant="ghost" type="button" onClick={() => setShowAddForm(false)}>Anuluj</Button>

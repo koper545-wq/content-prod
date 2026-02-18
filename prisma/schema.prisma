@@ -123,6 +123,15 @@ enum NotificationType {
   STRIKE_WARNING
   BOOKING_CANCELLED
   SLOT_CANCELLED
+  AGREEMENT_READY
+  AGREEMENT_SIGNED
+}
+
+enum AgreementStatus {
+  PENDING_RESTAURANT
+  PENDING_CREATOR
+  SIGNED
+  REJECTED
 }
 
 // ============================================================
@@ -181,6 +190,8 @@ model CreatorProfile {
   notesPrivate  String?       @map("notes_private")
   strikesCount  Int           @default(0) @map("strikes_count")
   strikesLastAt DateTime?     @map("strikes_last_at")
+  fullName      String?       @map("full_name")
+  pesel         String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -198,6 +209,9 @@ model Restaurant {
   instagramUrl     String?          @map("instagram_url")
   websiteUrl       String?          @map("website_url")
   phone            String?
+  companyName      String?          @map("company_name")
+  nip              String?
+  companyAddress   String?          @map("company_address")
   openingHoursJson Json?            @map("opening_hours_json")
   status           RestaurantStatus @default(ACTIVE)
   createdAt        DateTime         @default(now()) @map("created_at")
@@ -286,6 +300,7 @@ model Booking {
   creator           User               @relation("CreatorBookings", fields: [creatorUserId], references: [id])
   slot              Slot               @relation(fields: [slotId], references: [id])
   contentSubmission ContentSubmission?
+  agreement         Agreement?
   assets            Asset[]
   reports           Report[]
 
@@ -353,4 +368,29 @@ model Notification {
 
   @@index([userId, read])
   @@map("notifications")
+}
+
+model Agreement {
+  id                    String          @id @default(cuid())
+  bookingId             String          @unique @map("booking_id")
+  campaignTitle         String          @map("campaign_title")
+  restaurantCompanyName String          @map("restaurant_company_name")
+  restaurantNip         String          @map("restaurant_nip")
+  restaurantAddress     String          @map("restaurant_address")
+  creatorFullName       String          @map("creator_full_name")
+  creatorPesel          String          @map("creator_pesel")
+  deliverablesJson      Json            @map("deliverables_json")
+  offerDescription      String          @map("offer_description")
+  contentDeadlineDays   Int             @map("content_deadline_days")
+  copyrightClause       String          @default("non_exclusive_license") @map("copyright_clause")
+  confidentialityDays   Int             @default(365) @map("confidentiality_days")
+  status                AgreementStatus @default(PENDING_RESTAURANT)
+  restaurantSignedAt    DateTime?       @map("restaurant_signed_at")
+  creatorSignedAt       DateTime?       @map("creator_signed_at")
+  createdAt             DateTime        @default(now()) @map("created_at")
+  updatedAt             DateTime        @updatedAt @map("updated_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("agreements")
 }

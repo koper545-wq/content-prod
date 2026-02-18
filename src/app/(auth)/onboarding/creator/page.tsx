@@ -22,6 +22,8 @@ export default function CreatorOnboardingPage() {
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [followerRange, setFollowerRange] = useState("FROM_2K_TO_10K");
   const [niches, setNiches] = useState<string[]>([]);
+  const [fullName, setFullName] = useState("");
+  const [pesel, setPesel] = useState("");
   const [loading, setLoading] = useState(false);
 
   function toggleNiche(niche: string) {
@@ -49,6 +51,8 @@ export default function CreatorOnboardingPage() {
           portfolioUrl: portfolioUrl || undefined,
           followerRange,
           niches,
+          fullName: fullName || undefined,
+          pesel: pesel || undefined,
         }),
       });
 
@@ -135,6 +139,23 @@ export default function CreatorOnboardingPage() {
               <p className="text-xs text-gray-400 mt-1">Wybierz min. 1 niszę</p>
             )}
           </div>
+
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-xs text-gray-400 mb-3">Dane osobowe (do umów barterowych)</p>
+          </div>
+          <Input
+            label="Pełne imię i nazwisko (opcjonalnie)"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="np. Anna Maria Kowalska"
+          />
+          <Input
+            label="PESEL (opcjonalnie)"
+            value={pesel}
+            onChange={(e) => setPesel(e.target.value)}
+            placeholder="92010112345"
+            maxLength={11}
+          />
 
           <Button type="submit" className="w-full" loading={loading}>
             Zapisz i przejdź dalej

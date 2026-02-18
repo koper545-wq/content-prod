@@ -12,6 +12,9 @@ const schema = z.object({
   instagramUrl: z.string().url().optional().or(z.literal("")),
   websiteUrl: z.string().url().optional().or(z.literal("")),
   phone: z.string().optional().or(z.literal("")),
+  companyName: z.string().min(1).optional().or(z.literal("")),
+  nip: z.string().regex(/^\d{10}$/, "NIP musi mieć 10 cyfr").optional().or(z.literal("")),
+  companyAddress: z.string().min(1).optional().or(z.literal("")),
 });
 
 export async function POST(request: Request) {
@@ -40,6 +43,9 @@ export async function POST(request: Request) {
         instagramUrl: parsed.data.instagramUrl || null,
         websiteUrl: parsed.data.websiteUrl || null,
         phone: parsed.data.phone || null,
+        companyName: parsed.data.companyName || null,
+        nip: parsed.data.nip || null,
+        companyAddress: parsed.data.companyAddress || null,
       },
     });
 

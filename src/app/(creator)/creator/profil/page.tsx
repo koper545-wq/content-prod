@@ -20,6 +20,8 @@ interface Profile {
   followerRange: string;
   niches: string[];
   languages: string[];
+  fullName: string | null;
+  pesel: string | null;
 }
 
 interface User {
@@ -48,6 +50,8 @@ export default function ProfilPage() {
   const [followerRange, setFollowerRange] = useState("UNDER_2K");
   const [niches, setNiches] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>(["pl"]);
+  const [fullName, setFullName] = useState("");
+  const [pesel, setPesel] = useState("");
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -67,6 +71,8 @@ export default function ProfilPage() {
         setFollowerRange(p.followerRange);
         setNiches(p.niches);
         setLanguages(p.languages);
+        setFullName(p.fullName || "");
+        setPesel(p.pesel || "");
       }
       // Fetch portfolio after we have the user
       if (uData?.id) {
@@ -97,6 +103,8 @@ export default function ProfilPage() {
           followerRange,
           niches,
           languages,
+          fullName: fullName || undefined,
+          pesel: pesel || undefined,
         }),
       });
       const data = await res.json();
@@ -185,6 +193,25 @@ export default function ProfilPage() {
             onChange={setLanguages}
             placeholder="Dodaj język..."
             suggestions={["pl", "en", "de", "fr", "es", "it"]}
+          />
+
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-xs text-gray-400 mb-3">Dane do umów barterowych</p>
+          </div>
+
+          <Input
+            label="Pełne imię i nazwisko"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Anna Maria Kowalska"
+          />
+
+          <Input
+            label="PESEL"
+            value={pesel}
+            onChange={(e) => setPesel(e.target.value)}
+            placeholder="92010112345"
+            maxLength={11}
           />
         </Card>
 

@@ -12,6 +12,8 @@ const schema = z.object({
   followerRange: z.enum(["UNDER_2K", "FROM_2K_TO_10K", "FROM_10K_TO_30K", "FROM_30K_TO_100K", "OVER_100K"]),
   niches: z.array(z.string()).min(1),
   languages: z.array(z.string()).min(1),
+  fullName: z.string().min(2).optional().or(z.literal("")),
+  pesel: z.string().regex(/^\d{11}$/, "PESEL musi mieć 11 cyfr").optional().or(z.literal("")),
 });
 
 export async function GET() {
@@ -33,6 +35,8 @@ export async function GET() {
         languages: ["pl", "en"],
         strikesCount: 0,
         strikesLastAt: null,
+        fullName: "Anna Maria Kowalska",
+        pesel: "92010112345",
       },
     });
   }
@@ -64,6 +68,8 @@ export async function PUT(request: Request) {
     followerRange: parsed.data.followerRange,
     niches: parsed.data.niches,
     languages: parsed.data.languages,
+    fullName: parsed.data.fullName || null,
+    pesel: parsed.data.pesel || null,
   };
 
   const profile = await prisma.creatorProfile.upsert({

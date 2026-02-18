@@ -15,6 +15,9 @@ export default function RestaurantOnboardingPage() {
   const [instagramUrl, setInstagramUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [phone, setPhone] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [nip, setNip] = useState("");
+  const [companyAddress, setCompanyAddress] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -32,6 +35,9 @@ export default function RestaurantOnboardingPage() {
           instagramUrl: instagramUrl || undefined,
           websiteUrl: websiteUrl || undefined,
           phone: phone || undefined,
+          companyName: companyName || undefined,
+          nip: nip || undefined,
+          companyAddress: companyAddress || undefined,
         }),
       });
 
@@ -101,6 +107,29 @@ export default function RestaurantOnboardingPage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+48 22 123 4567"
+          />
+
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-xs text-gray-400 mb-3">Dane firmy (do umów barterowych)</p>
+          </div>
+          <Input
+            label="Nazwa firmy (opcjonalnie)"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="np. Trattoria Bella Sp. z o.o."
+          />
+          <Input
+            label="NIP (opcjonalnie)"
+            value={nip}
+            onChange={(e) => setNip(e.target.value)}
+            placeholder="1234567890"
+            maxLength={10}
+          />
+          <Input
+            label="Adres firmy (opcjonalnie)"
+            value={companyAddress}
+            onChange={(e) => setCompanyAddress(e.target.value)}
+            placeholder="ul. Przykładowa 1, 00-001 Warszawa"
           />
 
           <Button type="submit" className="w-full" loading={loading}>

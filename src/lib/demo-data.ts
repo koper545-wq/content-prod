@@ -14,6 +14,9 @@ const RESTAURANTS = [
     name: "Trattoria Bella",
     addressLine: "ul. Marszałkowska 42",
     city: "Warszawa",
+    companyName: "Trattoria Bella Sp. z o.o.",
+    nip: "5213456789",
+    companyAddress: "ul. Marszałkowska 42, 00-001 Warszawa",
     instagramUrl: "https://instagram.com/trattoria_bella",
     websiteUrl: "https://trattoriabella.pl",
     phone: "+48 22 123 4567",
@@ -27,6 +30,9 @@ const RESTAURANTS = [
     name: "Sushi Zen",
     addressLine: "ul. Nowy Świat 18",
     city: "Warszawa",
+    companyName: "Sushi Zen S.C. Tanaka & Kowalski",
+    nip: "5219876543",
+    companyAddress: "ul. Nowy Świat 18, 00-001 Warszawa",
     instagramUrl: "https://instagram.com/sushi_zen_waw",
     websiteUrl: null,
     phone: null,
@@ -145,6 +151,7 @@ const BOOKINGS = [
       restaurantApprovedAt: addDays(now, -1).toISOString(),
       status: "APPROVED",
     },
+    agreement: { id: "demo-agreement-001", status: "SIGNED" },
   },
   {
     id: "demo-booking-002",
@@ -167,6 +174,7 @@ const BOOKINGS = [
     campaign: { id: "demo-camp-002", title: "Sushi experience — TikTok", deliverablesJson: CAMPAIGNS[1].deliverablesJson, contentDeadlineDays: 5 },
     slot: SLOTS[2],
     contentSubmission: null,
+    agreement: { id: "demo-agreement-002", status: "PENDING_CREATOR" },
   },
   {
     id: "demo-booking-003",
@@ -189,6 +197,7 @@ const BOOKINGS = [
     campaign: { id: "demo-camp-001", title: "Letnie menu — reels & stories", deliverablesJson: CAMPAIGNS[0].deliverablesJson, contentDeadlineDays: 7 },
     slot: SLOTS[4],
     contentSubmission: null,
+    agreement: { id: "demo-agreement-003", status: "SIGNED" },
   },
   {
     id: "demo-booking-004",
@@ -220,6 +229,7 @@ const BOOKINGS = [
       restaurantApprovedAt: addDays(now, -1).toISOString(),
       status: "APPROVED",
     },
+    agreement: null,
   },
   {
     id: "demo-booking-005",
@@ -253,12 +263,13 @@ const BOOKINGS = [
       restaurantApprovedAt: addDays(now, -5).toISOString(),
       status: "APPROVED",
     },
+    agreement: { id: "demo-agreement-005", status: "SIGNED" },
   },
 ];
 
 const DEMO_USERS = [
-  { id: "demo-creator-001", email: "creator@demo.pl", nameDisplay: "Anna Kowalska", role: "CREATOR", status: "ACTIVE", suspendedUntil: null, createdAt: addDays(now, -14).toISOString(), lastLoginAt: now.toISOString(), creatorProfile: { strikesCount: 0, followerRange: "FROM_10K_TO_30K", city: "Warszawa", instagramUrl: "https://instagram.com/anna_foodie", tiktokUrl: "https://tiktok.com/@anna_foodie", portfolioUrl: null, niches: ["food", "lifestyle"], languages: ["pl", "en"] } },
-  { id: "demo-creator-002", email: "creator2@demo.pl", nameDisplay: "Marek Nowak", role: "CREATOR", status: "ACTIVE", suspendedUntil: null, createdAt: addDays(now, -10).toISOString(), lastLoginAt: addDays(now, -2).toISOString(), creatorProfile: { strikesCount: 0, followerRange: "FROM_2K_TO_10K", city: "Kraków", instagramUrl: "https://instagram.com/marek_eats", tiktokUrl: null, portfolioUrl: "https://marek-eats.pl", niches: ["food", "travel", "photography"], languages: ["pl"] } },
+  { id: "demo-creator-001", email: "creator@demo.pl", nameDisplay: "Anna Kowalska", role: "CREATOR", status: "ACTIVE", suspendedUntil: null, createdAt: addDays(now, -14).toISOString(), lastLoginAt: now.toISOString(), creatorProfile: { strikesCount: 0, followerRange: "FROM_10K_TO_30K", city: "Warszawa", instagramUrl: "https://instagram.com/anna_foodie", tiktokUrl: "https://tiktok.com/@anna_foodie", portfolioUrl: null, niches: ["food", "lifestyle"], languages: ["pl", "en"], fullName: "Anna Maria Kowalska", pesel: "92010112345" } },
+  { id: "demo-creator-002", email: "creator2@demo.pl", nameDisplay: "Marek Nowak", role: "CREATOR", status: "ACTIVE", suspendedUntil: null, createdAt: addDays(now, -10).toISOString(), lastLoginAt: addDays(now, -2).toISOString(), creatorProfile: { strikesCount: 0, followerRange: "FROM_2K_TO_10K", city: "Kraków", instagramUrl: "https://instagram.com/marek_eats", tiktokUrl: null, portfolioUrl: "https://marek-eats.pl", niches: ["food", "travel", "photography"], languages: ["pl"], fullName: "Marek Jan Nowak", pesel: "89052067890" } },
   { id: "demo-restaurant-001", email: "restauracja@demo.pl", nameDisplay: "Jan Restaurator", role: "RESTAURANT_OWNER", status: "ACTIVE", suspendedUntil: null, createdAt: addDays(now, -30).toISOString(), lastLoginAt: now.toISOString(), creatorProfile: null },
   { id: "demo-admin-001", email: "admin@demo.pl", nameDisplay: "Admin CONTENT", role: "ADMIN", status: "ACTIVE", suspendedUntil: null, createdAt: addDays(now, -60).toISOString(), lastLoginAt: now.toISOString(), creatorProfile: null },
   { id: "demo-pending-creator", email: "kasia@demo.pl", nameDisplay: "Kasia Wiśniewska", role: "CREATOR", status: "PENDING_VERIFICATION", suspendedUntil: null, createdAt: addDays(now, -1).toISOString(), lastLoginAt: null, creatorProfile: null },
@@ -284,6 +295,93 @@ const APPLICATIONS = [
   { id: "demo-app-002", campaignId: "demo-camp-001", creatorUserId: "demo-creator-002", message: "Hej! Jestem z Krakowa ale będę w Warszawie w przyszłym tygodniu. Mogę zrobić super reels!", preferredSlotIds: ["demo-slot-002"], status: "APPLIED", rejectionReason: null, createdAt: addDays(now, -2).toISOString(), updatedAt: addDays(now, -2).toISOString(), creator: DEMO_USERS[1], campaign: { id: "demo-camp-001", title: "Letnie menu — reels & stories" } },
   { id: "demo-app-003", campaignId: "demo-camp-002", creatorUserId: "demo-creator-001", message: "Sushi to moje ulubione! TikTok z mukbangiem będzie super 🍣", preferredSlotIds: ["demo-slot-003"], status: "ACCEPTED", rejectionReason: null, createdAt: addDays(now, -3).toISOString(), updatedAt: addDays(now, -3).toISOString(), creator: DEMO_USERS[0], campaign: { id: "demo-camp-002", title: "Sushi experience — TikTok" } },
   { id: "demo-app-004", campaignId: "demo-camp-002", creatorUserId: "demo-creator-002", message: "Sushi content to moja specjalność!", preferredSlotIds: ["demo-slot-004"], status: "ACCEPTED", rejectionReason: null, createdAt: addDays(now, -2).toISOString(), updatedAt: addDays(now, -2).toISOString(), creator: DEMO_USERS[1], campaign: { id: "demo-camp-002", title: "Sushi experience — TikTok" } },
+];
+
+const AGREEMENTS = [
+  {
+    id: "demo-agreement-001",
+    bookingId: "demo-booking-001",
+    campaignTitle: "Letnie menu — reels & stories",
+    restaurantCompanyName: "Trattoria Bella Sp. z o.o.",
+    restaurantNip: "5213456789",
+    restaurantAddress: "ul. Marszałkowska 42, 00-001 Warszawa",
+    creatorFullName: "Anna Maria Kowalska",
+    creatorPesel: "92010112345",
+    deliverablesJson: CAMPAIGNS[0].deliverablesJson,
+    offerDescription: "Degustacja 3 dań + napój (wartość ok. 120 zł)",
+    contentDeadlineDays: 7,
+    copyrightClause: "non_exclusive_license",
+    confidentialityDays: 365,
+    status: "SIGNED",
+    restaurantSignedAt: addDays(now, -4).toISOString(),
+    creatorSignedAt: addDays(now, -3).toISOString(),
+    createdAt: addDays(now, -4).toISOString(),
+    updatedAt: addDays(now, -3).toISOString(),
+    booking: { id: "demo-booking-001", creatorUserId: "demo-creator-001", restaurantId: "demo-rest-001", restaurant: { id: "demo-rest-001", name: "Trattoria Bella", ownerUserId: "demo-restaurant-001" } },
+  },
+  {
+    id: "demo-agreement-002",
+    bookingId: "demo-booking-002",
+    campaignTitle: "Sushi experience — TikTok",
+    restaurantCompanyName: "Sushi Zen S.C. Tanaka & Kowalski",
+    restaurantNip: "5219876543",
+    restaurantAddress: "ul. Nowy Świat 18, 00-001 Warszawa",
+    creatorFullName: "Anna Maria Kowalska",
+    creatorPesel: "92010112345",
+    deliverablesJson: CAMPAIGNS[1].deliverablesJson,
+    offerDescription: "All-you-can-eat sushi (wartość ok. 89 zł)",
+    contentDeadlineDays: 5,
+    copyrightClause: "non_exclusive_license",
+    confidentialityDays: 365,
+    status: "PENDING_CREATOR",
+    restaurantSignedAt: addDays(now, -1).toISOString(),
+    creatorSignedAt: null,
+    createdAt: addDays(now, -1).toISOString(),
+    updatedAt: addDays(now, -1).toISOString(),
+    booking: { id: "demo-booking-002", creatorUserId: "demo-creator-001", restaurantId: "demo-rest-002", restaurant: { id: "demo-rest-002", name: "Sushi Zen", ownerUserId: "demo-restaurant-001" } },
+  },
+  {
+    id: "demo-agreement-003",
+    bookingId: "demo-booking-003",
+    campaignTitle: "Letnie menu — reels & stories",
+    restaurantCompanyName: "Trattoria Bella Sp. z o.o.",
+    restaurantNip: "5213456789",
+    restaurantAddress: "ul. Marszałkowska 42, 00-001 Warszawa",
+    creatorFullName: "Anna Maria Kowalska",
+    creatorPesel: "92010112345",
+    deliverablesJson: CAMPAIGNS[0].deliverablesJson,
+    offerDescription: "Degustacja 3 dań + napój (wartość ok. 120 zł)",
+    contentDeadlineDays: 7,
+    copyrightClause: "non_exclusive_license",
+    confidentialityDays: 365,
+    status: "SIGNED",
+    restaurantSignedAt: addDays(now, -1).toISOString(),
+    creatorSignedAt: addDays(now, -1).toISOString(),
+    createdAt: addDays(now, -1).toISOString(),
+    updatedAt: addDays(now, -1).toISOString(),
+    booking: { id: "demo-booking-003", creatorUserId: "demo-creator-001", restaurantId: "demo-rest-001", restaurant: { id: "demo-rest-001", name: "Trattoria Bella", ownerUserId: "demo-restaurant-001" } },
+  },
+  {
+    id: "demo-agreement-005",
+    bookingId: "demo-booking-005",
+    campaignTitle: "Letnie menu — reels & stories",
+    restaurantCompanyName: "Trattoria Bella Sp. z o.o.",
+    restaurantNip: "5213456789",
+    restaurantAddress: "ul. Marszałkowska 42, 00-001 Warszawa",
+    creatorFullName: "Anna Maria Kowalska",
+    creatorPesel: "92010112345",
+    deliverablesJson: CAMPAIGNS[0].deliverablesJson,
+    offerDescription: "Degustacja 3 dań + napój (wartość ok. 120 zł)",
+    contentDeadlineDays: 7,
+    copyrightClause: "non_exclusive_license",
+    confidentialityDays: 365,
+    status: "SIGNED",
+    restaurantSignedAt: addDays(now, -12).toISOString(),
+    creatorSignedAt: addDays(now, -12).toISOString(),
+    createdAt: addDays(now, -14).toISOString(),
+    updatedAt: addDays(now, -12).toISOString(),
+    booking: { id: "demo-booking-005", creatorUserId: "demo-creator-001", restaurantId: "demo-rest-001", restaurant: { id: "demo-rest-001", name: "Trattoria Bella", ownerUserId: "demo-restaurant-001" } },
+  },
 ];
 
 const REPORTS = [
@@ -387,4 +485,24 @@ export function getDemoLibrary() {
     ...b.contentSubmission,
     booking: b,
   }));
+}
+
+export function getDemoAgreements(userId?: string) {
+  if (!userId) return AGREEMENTS;
+  // Find bookings for this user
+  const userBookingIds = BOOKINGS.filter(b => b.creatorUserId === userId).map(b => b.id);
+  return AGREEMENTS.filter(a => userBookingIds.includes(a.bookingId));
+}
+
+export function getDemoRestaurantAgreements(restaurantIds: string[]) {
+  const restaurantBookingIds = BOOKINGS.filter(b => restaurantIds.includes(b.restaurantId)).map(b => b.id);
+  return AGREEMENTS.filter(a => restaurantBookingIds.includes(a.bookingId));
+}
+
+export function getDemoAgreement(id: string) {
+  return AGREEMENTS.find(a => a.id === id) ?? null;
+}
+
+export function getDemoAgreementByBooking(bookingId: string) {
+  return AGREEMENTS.find(a => a.bookingId === bookingId) ?? null;
 }

@@ -12,6 +12,8 @@ const schema = z.object({
   portfolioUrl: z.string().url().optional().or(z.literal("")),
   followerRange: z.enum(["UNDER_2K", "FROM_2K_TO_10K", "FROM_10K_TO_30K", "FROM_30K_TO_100K", "OVER_100K"]),
   niches: z.array(z.string()).min(1, "Wybierz min. 1 niszę"),
+  fullName: z.string().min(2).optional().or(z.literal("")),
+  pesel: z.string().regex(/^\d{11}$/, "PESEL musi mieć 11 cyfr").optional().or(z.literal("")),
 });
 
 export async function POST(request: Request) {
@@ -40,6 +42,8 @@ export async function POST(request: Request) {
         portfolioUrl: parsed.data.portfolioUrl || null,
         followerRange: parsed.data.followerRange,
         niches: parsed.data.niches,
+        fullName: parsed.data.fullName || null,
+        pesel: parsed.data.pesel || null,
       },
       create: {
         userId: session.id,
@@ -50,6 +54,8 @@ export async function POST(request: Request) {
         followerRange: parsed.data.followerRange,
         niches: parsed.data.niches,
         languages: ["pl"],
+        fullName: parsed.data.fullName || null,
+        pesel: parsed.data.pesel || null,
       },
     });
 

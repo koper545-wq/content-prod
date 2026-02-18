@@ -100,3 +100,10 @@ export const USER_STATUS_LABELS: Record<string, string> = {
   SUSPENDED: "Zawieszony",
   BANNED: "Zbanowany",
 };
+
+export const AGREEMENT_STATUS_LABELS: Record<string, string> = {
+  PENDING_RESTAURANT: "Oczekuje na podpis restauracji",
+  PENDING_CREATOR: "Oczekuje na podpis twórcy",
+  SIGNED: "Podpisana",
+  REJECTED: "Odrzucona",
+};

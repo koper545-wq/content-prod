@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { isDemoUser } from "@/lib/demo-data";
-import { notifyApplicationAccepted } from "@/lib/notifications";
+import { notifyApplicationAccepted, notifyAgreementReady } from "@/lib/notifications";
 import { z } from "zod";
 import { addHours } from "date-fns";
 
@@ -29,7 +29,7 @@ export async function POST(
     where: { id },
     include: {
       campaign: { include: { restaurant: true } },
-      creator: true,
+      creator: { include: { creatorProfile: true } },
     },
   });
 
@@ -58,35 +58,67 @@ export async function POST(
   }
 
   const confirmBy = addHours(new Date(), application.campaign.confirmationRequiredHours);
+  const restaurant = application.campaign.restaurant;
+  const campaign = application.campaign;
+  const creatorProfile = application.creator.creatorProfile;
 
-  await prisma.$transaction([
-    prisma.application.update({
+  // Interactive transaction: create booking + agreement + update slot
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.application.update({
       where: { id },
       data: { status: "ACCEPTED" },
-    }),
-    prisma.booking.create({
+    });
+
+    const booking = await tx.booking.create({
       data: {
         campaignId: application.campaignId,
-        restaurantId: application.campaign.restaurantId,
+        restaurantId: campaign.restaurantId,
         creatorUserId: application.creatorUserId,
         slotId: parsed.data.slotId,
         status: "BOOKED",
         confirmBy,
       },
-    }),
-    prisma.slot.update({
+    });
+
+    await tx.slot.update({
       where: { id: parsed.data.slotId },
       data: {
         bookedCount: { increment: 1 },
         ...(slot.bookedCount + 1 >= slot.capacity ? { status: "FULL" } : {}),
       },
-    }),
-  ]);
+    });
 
+    // Auto-create agreement with snapshot data
+    const agreement = await tx.agreement.create({
+      data: {
+        bookingId: booking.id,
+        campaignTitle: campaign.title,
+        restaurantCompanyName: restaurant.companyName || restaurant.name,
+        restaurantNip: restaurant.nip || "BRAK",
+        restaurantAddress: restaurant.companyAddress || `${restaurant.addressLine}, ${restaurant.city}`,
+        creatorFullName: creatorProfile?.fullName || application.creator.nameDisplay,
+        creatorPesel: creatorProfile?.pesel || "BRAK",
+        deliverablesJson: campaign.deliverablesJson as object,
+        offerDescription: campaign.offerValueDesc,
+        contentDeadlineDays: campaign.contentDeadlineDays,
+        status: "PENDING_RESTAURANT",
+      },
+    });
+
+    return { booking, agreement };
+  });
+
+  // Send notifications (outside transaction)
   await notifyApplicationAccepted(
     application.creatorUserId,
-    application.campaign.title,
+    campaign.title,
     application.campaignId
+  );
+
+  await notifyAgreementReady(
+    application.creatorUserId,
+    campaign.title,
+    result.agreement.id
   );
 
   return NextResponse.json({ ok: true });
